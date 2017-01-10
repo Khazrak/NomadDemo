@@ -1,3 +1,4 @@
+bind_addr = IP
 # Increase log verbosity
 log_level = "DEBUG"
 
