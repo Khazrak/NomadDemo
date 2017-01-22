@@ -10,7 +10,7 @@ sudo apt-get install -y unzip curl wget vim
 echo Fetching Nomad...
 cd /tmp/
 curl -sSL https://releases.hashicorp.com/nomad/0.5.2/nomad_0.5.2_linux_amd64.zip -o nomad.zip
-
+curl -sSL https://releases.hashicorp.com/consul/0.7.2/consul_0.7.2_linux_amd64.zip -o consul.zip
 echo Installing Nomad...
 unzip nomad.zip
 sudo chmod +x nomad
@@ -19,8 +19,14 @@ sudo mv nomad /usr/bin/nomad
 sudo mkdir -p /etc/nomad.d
 sudo chmod a+w /etc/nomad.d
 
+curl -sSL https://releases.hashicorp.com/consul/0.7.2/consul_0.7.2_linux_amd64.zip -o consul.zip
+echo Installing Consul...
+unzip consul.zip
+sudo chmod +x consul
+sudo mv consul /usr/bin/consul
 
-
+sudo mkdir -p /etc/consul.d
+sudo chmod a+w /etc/consul.d
 
 SCRIPT
 
@@ -41,6 +47,7 @@ $vm_ip = $vm_starting_ip
 
 Vagrant.configure(2) do |config|
   config.vm.box = "puphpet/ubuntu1404-x64"
+ # config.vm.box = "ubuntu/xenial64"
   config.ssh.insert_key = true
   
   config.vm.provision "shell", inline: $script, privileged: false
@@ -54,19 +61,18 @@ Vagrant.configure(2) do |config|
     
         config.vm.define vm_name = "%s-%02d" % [$instance_name_prefix, i] do |config|
             config.vm.hostname = vm_name
-            config.vm.provision "file", :source => "#{FILES_DIR}", :destination => "/home/vagrant/files"
-            
-            # Set hostname's IP to made advertisement Just Work
-            config.vm.provision "shell", privileged: true, inline: "sudo sed -i -e \"s/.*nomad.*/$(ip route get 1 | awk '{print $NF;exit}') #{vm_name}/\" /etc/hosts"
-            
-            config.vm.provision "shell", privileged: true, inline: <<-SHELL
-                echo \"export test=mytest\" >> /etc/profile.d/myvars.sh
-	    SHELL
-            
+            config.vm.provision "file", :source => "#{FILES_DIR}", :destination => "/home/vagrant"
+         
             ip = IPAddr.new($vm_ip)
             $vm_ip = ip.succ.to_s
             config.vm.network :private_network, ip: $vm_ip
             config.vm.provision "shell", privileged: false, inline: "sudo sed -i -e \"s/IP/\\\"#{$vm_ip}\\\"/\" /home/vagrant/files/server*" 
+            config.vm.provision "shell" do |s|
+				ip = $vm_ip
+				s.inline = "sudo sed -i -e \"s/.*nomad.*/$1 $2/\" /etc/hosts"
+				s.args = ["#{ip}","#{vm_name}"]
+			end
+           
         end
   end
   

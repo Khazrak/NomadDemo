@@ -5,6 +5,11 @@ log_level = "DEBUG"
 # Setup data dir
 data_dir = "/tmp/server"
 
+consul {
+  address = "172.17.8.101:8500"
+}
+
+
 # Enable the server
 server {
     enabled = true
