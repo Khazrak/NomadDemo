@@ -5,7 +5,7 @@ log_level = "DEBUG"
 data_dir = "/tmp/client"
 
 consul {
-  address = "172.17.8.101:8500"
+  address = "IP:8500"
 }
 
 

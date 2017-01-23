@@ -1,4 +1,4 @@
-bind_addr = IP
+bind_addr = "IP"
 # Increase log verbosity
 log_level = "DEBUG"
 
@@ -6,7 +6,7 @@ log_level = "DEBUG"
 data_dir = "/tmp/server"
 
 consul {
-  address = "172.17.8.101:8500"
+  address = "IP:8500"
 }
 
 

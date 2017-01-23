@@ -66,13 +66,20 @@ Vagrant.configure(2) do |config|
             ip = IPAddr.new($vm_ip)
             $vm_ip = ip.succ.to_s
             config.vm.network :private_network, ip: $vm_ip
-            config.vm.provision "shell", privileged: false, inline: "sudo sed -i -e \"s/IP/\\\"#{$vm_ip}\\\"/\" /home/vagrant/files/server*" 
+
+            config.vm.provision "shell", privileged: false, inline: "sudo sed -i -e \"s/IP/#{$vm_ip}/\" /home/vagrant/files/server*" 
+
+            config.vm.provision "shell", privileged: false, inline: "sudo sed -i -e \"s/IP/#{$vm_ip}/\" /home/vagrant/files/client*" 
+
+            config.vm.provision "shell", privileged: false, inline: "sudo sed -i -e \"s/IP/#{$vm_ip}/\" /home/vagrant/files/start_consul.sh" 
+
+            config.vm.provision "shell", privileged: false, inline: "sudo sed -i -e \"s/IP/#{$vm_ip}/\" /home/v    agrant/files/consul_join.sh"
+
             config.vm.provision "shell" do |s|
 				ip = $vm_ip
 				s.inline = "sudo sed -i -e \"s/.*nomad.*/$1 $2/\" /etc/hosts"
 				s.args = ["#{ip}","#{vm_name}"]
 			end
-           
         end
   end
   
